@@ -1,6 +1,6 @@
-# signate_26_j_league_attendance-
+# signate_1_bank_customer
+SIGNATEの練習問題【銀行の顧客ターゲティング】
 
-SIGNATEの練習問題【Jリーグの観客動員数予測】
 ```
 make main.py
 ```
