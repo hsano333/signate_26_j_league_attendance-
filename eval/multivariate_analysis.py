@@ -1,0 +1,2 @@
+class MultivariateAnalysis:
+    pass
