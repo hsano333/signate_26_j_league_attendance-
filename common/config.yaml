@@ -1,0 +1,635 @@
+base_random_state: 42
+dummies_dataset:
+  overwrite: true
+  target_feature: y
+model:
+  knn:
+    is_optimize: false
+    learned_params:
+      metric: manhattan
+      n_neighbors: 10
+      p: 2
+      weights: distance
+    model_file_name: model_and_accuracy.pkl
+    n_neighbors: 2
+    optimize:
+      categorical:
+        metric:
+        - minkowski
+        - euclidean
+        - manhattan
+        weights:
+        - uniform
+        - distance
+      int:
+        n_neighbors:
+        - 1
+        - 50
+        p:
+        - 1
+        - 2
+    optimize_direction: minimize
+    optimize_overwrite: false
+    overwrite: true
+    proba: false
+  lightgbm:
+    is_optimize: false
+    label_number: -1
+    learned_params:
+      bagging_fraction: 0.48040309601268943
+      bagging_freq: 0
+      boosting_type: gbdt
+      feature_fraction: 0.9519162167422309
+      is_unbalance: true
+      lambda_l1: 0.008008713754555918
+      lambda_l2: 1.984668725676424
+      learning_rate: 0.45861021208001373
+      max_depth: 10
+      metric: rmse
+      min_child_weight: 4
+      n_estimators: 233
+      num_leaves: 305
+      objective: regression
+      verbosity: -1
+    metric: rmse
+    model_file_name: model_and_accuracy.pkl
+    objective: binary
+    optimize:
+      categorical: null
+      const:
+        boosting_type: gbdt
+        is_unbalance: true
+        metric: rmse
+        objective: regression
+        verbosity: -1
+      float:
+        bagging_fraction:
+        - 0.4
+        - 1.0
+        feature_fraction:
+        - 0.4
+        - 1.0
+        lambda_l1:
+        - 1e-8
+        - 10
+        lambda_l2:
+        - 1e-8
+        - 10
+        learning_rate:
+        - 1e-4
+        - 0.5
+      int:
+        bagging_freq:
+        - 0
+        - 10
+        max_depth:
+        - 3
+        - 12
+        min_child_weight:
+        - 1
+        - 100
+        n_estimators:
+        - 50
+        - 2000
+        num_leaves:
+        - 8
+        - 1024
+    optimize_direction: minimize
+    optimize_overwrite: true
+    overwrite: true
+    verbosity: -1
+  logistic_regression:
+    is_optimize: false
+    learned_params:
+      C: 5538.334092320503
+      class_weight: balanced
+      l1_ratio: 0.704972469554787
+      penalty: l2
+      random_state: 42
+      solver: lbfgs
+    model_file_name: model_and_accuracy.pkl
+    optimize:
+      categorical:
+        class_weight:
+        - balanced
+        - null
+        penalty:
+        - none
+        - l1
+        - l2
+        - elasticnet
+        solver:
+        - newton-cg
+        - lbfgs
+        - liblinear
+        - newton-cg
+        - newton-cholesky
+        - sag
+        - saga
+      const:
+        random_state: 42
+      float:
+        C:
+        - 1e-4
+        - 1e4
+        l1_ratio:
+        - 0.0
+        - 1.0
+      int: null
+    optimize_direction: minimize
+    optimize_overwrite: false
+    overwrite: true
+  mytorch:
+    batch_size: 64
+    continue: true
+    display_step: 10
+    dropout: 0.25
+    epoch: 400
+    is_optimize: false
+    learned_params:
+      batch_size: 64
+      gamma: 0.8258243781423222
+      lr: 0.0001918767120253148
+      max_grad_norm: 0
+      momentum: 0.9888896040774584
+      random_state: 42
+      scheduler: StepLR
+      step_size: 22
+      weight_decay: 0.006360193779807544
+    max_depth: 5
+    optimize:
+      adam:
+        categorical:
+          amsgrad:
+          - true
+          - false
+        float:
+          beta1:
+          - 0.8
+          - 0.999
+          beta2:
+          - 0.9
+          - 0.9999
+          eps:
+          - 5e-09
+          - 5e-07
+          lr:
+          - 1e-04
+          - 1e-02
+          - true
+          weight_decay:
+          - 1e-6
+          - 1e-2
+          - true
+      categorical: null
+      const:
+        random_state: 42
+      int: null
+      loss:
+        const: null
+        float: null
+      mse:
+        categorical: null
+        const: null
+      sgd:
+        categorical: null
+        const: null
+        float:
+          lr:
+          - 1e-04
+          - 1e-03
+          momentum:
+          - 0.0
+          - 0.99
+          weight_decay:
+          - 1e-6
+          - 1e-2
+        int: null
+      torch:
+        categorical:
+          batch_size:
+          - 32
+          - 64
+          - 128
+          max_grad_norm:
+          - 0
+          - 0.5
+          - 1.0
+          - 5.0
+          scheduler:
+          - None
+          - StepLR
+          - CosineAnnealingLR
+    optimize_direction: minimize
+    optimize_overwrite: true
+    overwrite: true
+    pos_weight: 7.5
+  poly:
+    is_optimize: false
+    learned_params:
+      max_trials: 150
+      min_samples: 0.41358440010347214
+      random_state: 42
+      residual_threshold: 49.99531136930242
+    model_file_name: model_and_accuracy.pkl
+    optimize:
+      categorical: null
+      const:
+        max_trials: 150
+        random_state: 42
+      float:
+        min_samples:
+        - 0.2
+        - 0.8
+        residual_threshold:
+        - 10.0
+        - 80.0
+      int: null
+    optimize_direction: minimize
+    optimize_overwrite: true
+    overwrite: true
+  randomforest:
+    is_optimize: false
+    learned_params:
+      criterion: squared_error
+      max_depth: 18
+      max_features: null
+      min_samples_leaf: 1
+      min_samples_split: 2
+      n_estimators: 139
+      random_state: 42
+    metric: multi_logloss
+    model_file_name: model_and_accuracy.pkl
+    objective: multiclass
+    optimize:
+      categorical:
+        max_features:
+        - sqrt
+        - log2
+        - null
+      const:
+        criterion: squared_error
+        random_state: 42
+      int:
+        max_depth:
+        - 2
+        - 20
+        min_samples_leaf:
+        - 1
+        - 10
+        min_samples_split:
+        - 2
+        - 20
+        n_estimators:
+        - 50
+        - 300
+    optimize_direction: minimize
+    optimize_overwrite: true
+    overwrite: true
+    proba: false
+  ransac:
+    is_optimize: false
+    learned_params:
+      min_samples: 0.25
+      random_state: 42
+      residual_threshold: 25
+    model_file_name: model_and_accuracy.pkl
+    optimize:
+      categorical: null
+      const:
+        max_trials: 150
+        random_state: 42
+      float:
+        min_samples:
+        - 0.2
+        - 0.8
+        residual_threshold:
+        - 1.0
+        - 20.0
+      int: null
+    optimize_direction: minimize
+    optimize_overwrite: true
+    overwrite: true
+  result_linear_regression:
+    is_optimize: false
+    learned_params:
+      weight_max: 1.0
+      weight_min: 0.0
+    model_file_name: model_and_accuracy.pkl
+    optimize:
+      categorical: null
+      float: null
+      int: null
+    optimize_direction: minimize
+    optimize_overwrite: false
+    overwrite: true
+  result_logistic_regression:
+    is_optimize: false
+    learned_params:
+      C: 6212.449005890426
+      class_weight: balanced
+      l1_ratio: 0.007657340811358715
+      penalty: l2
+      random_state: 42
+      solver: newton-cg
+    model_file_name: model_and_accuracy.pkl
+    optimize:
+      categorical:
+        class_weight:
+        - balanced
+        - null
+        penalty:
+        - none
+        - l1
+        - l2
+        - elasticnet
+        solver:
+        - newton-cg
+        - lbfgs
+        - liblinear
+        - newton-cg
+        - newton-cholesky
+        - sag
+        - saga
+      const:
+        random_state: 42
+      float:
+        C:
+        - 1e-4
+        - 1e4
+        l1_ratio:
+        - 0.0
+        - 1.0
+      int: null
+    optimize_direction: minimize
+    optimize_overwrite: true
+    overwrite: true
+    threshold: 0.5
+  result_xgboost:
+    eval_metric: rmse
+    is_optimize: false
+    learned_params:
+      booster: gbtree
+      colsample_bytree: 0.8699702581250595
+      eval_metric: rmse
+      gamma: 4.733766861880925
+      learning_rate: 0.28446474741755745
+      max_depth: 12
+      min_child_weight: 20
+      n_estimators: 7
+      objective: binary:logistic
+      reg_alpha: 0.8265186899244789
+      reg_lambda: 0.9917749807057756
+      subsample: 0.5912840567904745
+      tree_method: auto
+    model_file_name: model_and_accuracy.pkl
+    objective: binary_logistic
+    optimize:
+      categorical:
+        booster:
+        - gbtree
+        - dart
+        - gblinear
+        tree_method:
+        - auto
+        - exact
+        - hist
+      const:
+        eval_metric: rmse
+        objective: binary:logistic
+      float:
+        colsample_bytree:
+        - 0.4
+        - 1.0
+        gamma:
+        - 0.0
+        - 5.0
+        learning_rate:
+        - 1e-4
+        - 0.5
+        reg_alpha:
+        - 1e-8
+        - 10
+        reg_lambda:
+        - 1e-8
+        - 10
+        subsample:
+        - 0.4
+        - 1.0
+      int:
+        max_depth:
+        - 3
+        - 12
+        min_child_weight:
+        - 1
+        - 20
+        n_estimators:
+        - 50
+        - 2000
+    optimize_direction: minimize
+    optimize_overwrite: true
+    overwrite: true
+  svc:
+    C: 1.0
+    gamma: scale
+    is_optimize: false
+    kernel: rbf
+    learned_params:
+      C: 0.300358622502321
+      gamma: 0.4676709057147144
+      kernel: rbf
+      random_state: 42
+    model_file_name: model_and_accuracy.pkl
+    optimize:
+      categorical:
+        kernel:
+        - linear
+        - poly
+        - rbf
+        - sigmoid
+      const:
+        random_state: 42
+      float:
+        C:
+        - 1e-3
+        - 5e1
+        gamma:
+        - 1e-5
+        - 1e0
+      int: null
+    optimize_direction: minimize
+    optimize_overwrite: false
+    overwrite: true
+  time_linear_regression:
+    is_optimize: false
+    learned_params:
+      weight_max: 1.0
+      weight_min: 0.0
+    model_file_name: model_and_accuracy.pkl
+    optimize:
+      categorical: null
+      float: null
+      int: null
+    optimize_direction: minimize
+    optimize_overwrite: false
+    overwrite: true
+  time_xgboost:
+    eval_metric: rmse
+    is_optimize: false
+    learned_params:
+      booster: gbtree
+      colsample_bytree: 0.8343597394289158
+      eval_metric: rmse
+      gamma: 1.297370222190503
+      learning_rate: 0.34231492018825355
+      max_depth: 8
+      min_child_weight: 1
+      n_estimators: 998
+      objective: reg:squarederror
+      reg_alpha: 4.69883918514246
+      reg_lambda: 7.68660358242504
+      scale_pos_weight: 7.5
+      subsample: 0.7590141403886435
+      tree_method: exact
+    model_file_name: model_and_accuracy.pkl
+    objective: reg:squarederror
+    optimize:
+      categorical:
+        booster:
+        - gbtree
+        - dart
+        - gblinear
+        tree_method:
+        - auto
+        - exact
+        - hist
+      const:
+        eval_metric: rmse
+        objective: reg:squarederror
+        scale_pos_weight: 7.5
+      float:
+        colsample_bytree:
+        - 0.4
+        - 1.0
+        gamma:
+        - 0.0
+        - 5.0
+        learning_rate:
+        - 1e-4
+        - 0.5
+        reg_alpha:
+        - 1e-8
+        - 10
+        reg_lambda:
+        - 1e-8
+        - 10
+        subsample:
+        - 0.4
+        - 1.0
+      int:
+        max_depth:
+        - 3
+        - 12
+        min_child_weight:
+        - 1
+        - 20
+        n_estimators:
+        - 50
+        - 2000
+    optimize_direction: minimize
+    optimize_overwrite: true
+    overwrite: true
+    proba: false
+  xgboost:
+    eval_metric: rmse
+    is_optimize: false
+    learned_params:
+      booster: gbtree
+      colsample_bytree: 0.5153883262638148
+      eval_metric: rmse
+      gamma: 0.16512650865494377
+      learning_rate: 0.02455439144453788
+      max_depth: 3
+      min_child_weight: 2
+      n_estimators: 1156
+      objective: reg:squarederror
+      reg_alpha: 0.21382083751316933
+      reg_lambda: 0.2399884449536737
+      scale_pos_weight: 7.5
+      subsample: 0.5353905843803611
+      tree_method: hist
+    model_file_name: model_and_accuracy.pkl
+    objective: reg:squarederror
+    optimize:
+      categorical:
+        booster:
+        - gbtree
+        - dart
+        - gblinear
+        tree_method:
+        - auto
+        - exact
+        - hist
+      const:
+        eval_metric: rmse
+        objective: reg:squarederror
+        scale_pos_weight: 7.5
+      float:
+        colsample_bytree:
+        - 0.4
+        - 1.0
+        gamma:
+        - 0.0
+        - 5.0
+        learning_rate:
+        - 1e-4
+        - 0.5
+        reg_alpha:
+        - 1e-8
+        - 10
+        reg_lambda:
+        - 1e-8
+        - 10
+        subsample:
+        - 0.4
+        - 1.0
+      int:
+        max_depth:
+        - 3
+        - 12
+        min_child_weight:
+        - 1
+        - 20
+        n_estimators:
+        - 50
+        - 2000
+    optimize_direction: minimize
+    optimize_overwrite: true
+    overwrite: true
+    proba: false
+  xgboost_learn:
+    colsample_bytree: 0.8
+    eval_metric: rmse
+    learning_rate: 0.1
+    max_depth: 4
+    model_file_name: model_and_accuracy.pkl
+    n_estimators: 200
+    objective: binary_logistic
+    optimize_direction: minimize
+    optimize_overwrite: false
+    overwrite: true
+    subsample: 0.8
+optimization:
+  n_trials: 200
+optimize: null
+original_dataset:
+  overwrite: true
+  target_feature: y
+stacking:
+  force_make: true
+  k_fold: 5
+  random_state: 42
+  verbose: true
+xgboost_dataset:
+  overwrite: true
+  target_feature: y
