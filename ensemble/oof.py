@@ -95,6 +95,10 @@ class OOF:
         y_test_all = np.zeros(len(test))
         y_true_all = np.zeros(len(data))
         for i, (tr_idx, val_idx) in enumerate(kf.split(data, split_label)):
+            # if i == 0:
+            #     print(f"{tr_idx[0:200]=}")
+            #     print(f"{tr_idx[200:400]=}")
+            #     print(f"{val_idx=}")
             k_directory = directory / f"fold_{i + 1}"
             va_idxes.append(val_idx)
             train_data, val_data = data[tr_idx], data[val_idx]
