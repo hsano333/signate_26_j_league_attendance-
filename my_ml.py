@@ -73,6 +73,8 @@ def predict(ensemble, train_models, predict_model, evaluation, other_models):
 
     dataset = train_models[0][1]
     label_scaler = dataset.get_label_scaler()
+    (train_offset, test_offset) = dataset.get_mean_df()
+
     # raw_label_data = label_scaler.inverse_transform(dataset.get_raw_label().to_frame())
     raw_label_data = dataset.get_raw_label()
     test_data = dataset.get_numpy_data()[2]
@@ -88,10 +90,20 @@ def predict(ensemble, train_models, predict_model, evaluation, other_models):
     pred_data = label_scaler.inverse_transform(final_result.get_numpy_data()[0])
     label = final_result.get_numpy_data()[1]
 
+    print(f"{type(train_offset)=}")
+    print(f"{type(pred_data)=}")
+    print(f"{(train_offset.shape)=}")
+    print(f"{(pred_data.shape)=}")
+    # train_score = evaluation(raw_label_data, pred_data + train_offset.to_frame())
     train_score = evaluation(raw_label_data, pred_data)
+    # train_score = evaluation(raw_label_data, pred_data)
     print(f"Result Train Result Score: {train_score:.4f}")
 
-    test_data = label_scaler.inverse_transform(final_result.get_numpy_data()[2])
+    test_data = (
+        label_scaler.inverse_transform(final_result.get_numpy_data()[2])
+        # + test_offset.to_frame().to_numpy()
+    )
+    print(f"{type(test_data)=}")
 
     id = dataset.get_test_id()
     df = pd.DataFrame({"id": id, "activity": test_data.reshape(-1)})

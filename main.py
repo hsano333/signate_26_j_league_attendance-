@@ -130,8 +130,8 @@ def make_predict_models():
 def get_train_models(models):
     selected_models = []
     names = [
-        "mytorch",
-        # "randomforest",
+        # "mytorch",
+        "randomforest",
         # "xgboost",
         # "lightgbm",
         # "knn",
