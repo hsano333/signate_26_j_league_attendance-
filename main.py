@@ -65,13 +65,13 @@ def make_models():
     ]
     random_forest = [
         "randomforest",
-        dataset_category,
+        dataset_category_xgboost,
         MyRandomForest,
         BaseEvaluation,
     ]
     light_gbm = [
         "lightgbm",
-        dataset_category_xgboost,
+        dataset_category,
         MyLightGBM,
         BaseEvaluation,
     ]

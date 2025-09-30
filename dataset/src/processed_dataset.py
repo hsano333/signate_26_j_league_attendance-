@@ -146,11 +146,14 @@ class ProcessedDataset(Dataset):
         return self.model
 
     def adjust_rank(self, data):
-        data["first"] = False
+        data["first1"] = False
+        data["first2"] = False
         data["second"] = False
         data["second_last"] = False
         data["last"] = False
-        data.loc[(data["section"] >= 1) & (data["section"] <= 2), "first"] = True
+        data.loc[(data["section"] == 1), "first1"] = True
+        data.loc[(data["section"] == 2), "first2"] = True
+        # data.loc[(data["section"] >= 1) & (data["section"] <= 2), "first"] = True
         data.loc[(data["second"] >= 3) & (data["section"] <= 7), "second"] = True
         data.loc[(data["stage"] == "J1") & (data["section"] >= 29), "second_last"] = (
             True
@@ -228,12 +231,10 @@ class ProcessedDataset(Dataset):
         data["away_second_last_top"] = False
         data["home_second_last_bottom"] = False
         data["away_second_last_bottom"] = False
-
         data["home_last_top"] = False
         data["away_last_top"] = False
         data["home_last_bottom"] = False
         data["away_last_bottom"] = False
-
         data["home_last_second_top"] = False
         data["away_last_second_top"] = False
         data["home_last_second_bottom"] = False
@@ -326,6 +327,8 @@ class ProcessedDataset(Dataset):
 
         data = self.adjust_rank(data)
 
+        data["humidity"] = data["humidity"].str.replace("%", "").astype(float)
+
         # data["home_score"] = data["home_score"] / data["section"]
         # data["away_score"] = data["away_score"] / data["section"]
         data = data.drop(
@@ -334,10 +337,10 @@ class ProcessedDataset(Dataset):
                 "id",
                 "gameday",
                 "time",
-                # "stadium",
+                "stadium",
                 "tv",
                 "weather",
-                "temperature",
+                # "temperature",
                 "humidity",
                 "home_score",
                 "away_score",
@@ -347,7 +350,7 @@ class ProcessedDataset(Dataset):
                 # "mean",
                 # "home",
                 "count",
-                "num_tv",
+                # "num_tv",
                 "std",
                 # "capa",
                 "t25",
@@ -356,8 +359,28 @@ class ProcessedDataset(Dataset):
                 "min",
                 "max",
                 # "home_rank",
-                "away_rank",
-                # "mean",
+                # "away_rank",
+                "mean",
+                "home_top_three",
+                "home_bottom_three",
+                "home_second_top_three",
+                "home_second_bottom_three",
+                "away_top_three",
+                "away_bottom_three",
+                "away_second_top_three",
+                "away_second_bottom_three",
+                "home_second_last_top",
+                "away_second_last_top",
+                "home_second_last_bottom",
+                "away_second_last_bottom",
+                "home_last_top",
+                "away_last_top",
+                "home_last_bottom",
+                "away_last_bottom",
+                "home_last_second_top",
+                "away_last_second_top",
+                "home_last_second_bottom",
+                "away_last_second_bottom",
             ],
             axis=1,
         )
@@ -635,9 +658,11 @@ class ProcessedDataset(Dataset):
         numerical_features = [
             "capa",
             "home_rank",
-            # "away_rank",
+            "away_rank",
             "rank_sum",
-            "mean",
+            # "mean",
+            # "home_score",
+            # "away_score",
             # "max",
             # "min",
             # "t25",
@@ -646,19 +671,23 @@ class ProcessedDataset(Dataset):
             # "home_score",
             # "away_score",
             # "std",
+            "temperature",
+            # "humidity",
         ]
         # numerical_features = ["home_rank", "away_rank"]
         # kxnumerical_features = []
         # categorical_features = list(set(full_train.columns) - set(numerical_features))
         # categorical_features = ["year", "stage", "home", "away", "weekday", "hour"]
         categorical_features = [
+            "num_tv",
             "year",
             "stage",
             "home",
             "away",
             "weekday",
             "hour",
-            "stadium",
+            # "month",
+            # "stadium",
             # "home_rank",
         ]
 
@@ -679,6 +708,14 @@ class ProcessedDataset(Dataset):
         col_transformers.set_output(transform="pandas")
         train_df = col_transformers.transform(full_train)
         test_df = col_transformers.transform(full_test)
+        # print(f"{train_df.columns[0:20]=}, {test_df.shape=}")
+        # print(f"{train_df.columns[20:40]=}, {test_df.shape=}")
+        # print(f"{train_df.columns[40:60]=}, {test_df.shape=}")
+        # print(f"{train_df.columns[60:80]=}, {test_df.shape=}")
+        # print(f"{train_df.columns[-100:-80]=}, {test_df.shape=}")
+        # print(f"{train_df.columns[-80:-60]=}, {test_df.shape=}")
+        # print(f"{train_df.columns[-60:-40]=}, {test_df.shape=}")
+        # print(f"{train_df.columns[-40:]=}, {test_df.shape=}")
 
         self.data = self.convert_np_to_torch(train_df)
         self.label_scaler = StandardScaler()
