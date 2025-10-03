@@ -244,7 +244,7 @@ class ProcessedDatasetXGBoost(Dataset):
                 "home_score",
                 "away_score",
                 # "away_rank",
-                # "rank_sum",
+                "rank_sum",
                 "month",
                 "match",
                 "section",
