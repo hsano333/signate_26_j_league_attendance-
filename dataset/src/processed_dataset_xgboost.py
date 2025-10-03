@@ -248,7 +248,7 @@ class ProcessedDatasetXGBoost(Dataset):
                 "month",
                 "match",
                 "section",
-                "num_tv",
+                # "num_tv",
             ],
             axis=1,
         )
@@ -479,7 +479,7 @@ class ProcessedDatasetXGBoost(Dataset):
 
         # drop_col = ["capa", "home_rank", "away_rank"]
         # numerical_features = ["capa", "home_rank", "away_rank", "rank_sum"]
-        numerical_features = ["capa", "home_rank", "away_rank"]
+        numerical_features = ["capa", "home_rank", "away_rank", "num_tv"]
         # numerical_features = ["capa"]
         # numerical_features = ["home_rank", "away_rank"]
         # numerical_features = ["home_rank", "away_rank"]
