@@ -484,6 +484,18 @@ class ProcessedDatasetXGBoost(Dataset):
         # numerical_features = ["home_rank", "away_rank"]
         # numerical_features = ["home_rank", "away_rank"]
         categorical_features = list(set(full_train.columns) - set(numerical_features))
+        # categorical_features = [
+        #     "num_tv",
+        #     "year",
+        #     "stage",
+        #     "home",
+        #     "away",
+        #     "weekday",
+        #     "hour",
+        #     # "month",
+        #     # "stadium",
+        #     # "home_rank",
+        # ]
 
         numerical_transformer.fit(full_train[numerical_features])
         categorical_transformer.fit(full_train[categorical_features])
