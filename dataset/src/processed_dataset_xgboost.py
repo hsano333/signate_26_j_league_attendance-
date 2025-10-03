@@ -499,7 +499,6 @@ class ProcessedDatasetXGBoost(Dataset):
         #     "home",
         #     "away",
         #     "weekday",
-        #     "hour",
         #     # "month",
         #     # "stadium",
         #     # "home_rank",
