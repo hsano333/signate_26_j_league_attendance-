@@ -110,66 +110,6 @@ class ProcessedDatasetXGBoost(Dataset):
 
         return df
 
-    def mypreprocessing(self, data, onehot_encoder):
-        data["payday"] = data["payday"].fillna(0)
-        data["event"] = data["event"].fillna("なし")
-        data["remarks"] = data["remarks"].fillna("なし")
-        data["precipitation"] = data["precipitation"].apply(
-            lambda x: -1 if x == "--" else float(x)
-        )
-        # data["month"] = data["datetime"].apply(lambda x: int(x.split("-")[1]))
-        data["curry"] = data["name"].apply(lambda x: 1 if x.find("カレー") >= 0 else 0)
-        data["fun"] = data["remarks"].apply(
-            lambda x: 1 if x == "お楽しみメニュー" else 0
-        )
-        data.loc[data["weather"] == "快晴", "weather"] = "晴れ"
-        data.loc[data["weather"] == "雨", "weather"] = "なし"
-        data.loc[data["weather"] == "雪", "weather"] = "なし"
-        data.loc[data["weather"] == "雷電", "weather"] = "なし"
-
-        data.loc[
-            (
-                (data["remarks"] != "料理長のこだわりメニュー")
-                & (data["remarks"] != "お楽しみメニュー")
-            ),
-            "remarks",
-        ] = "なし"
-
-        data["datetime"] = pd.to_datetime(data["datetime"])
-
-        data = self.convert_oneshot(data, "event")
-        data = self.convert_oneshot(data, "remarks")
-        data = self.convert_oneshot(data, "weather")
-        # data = self.convert_oneshot(data, "week")
-        data = self.convert_oneshot(data, "weekday")
-        # data = self.convert_oneshot(data, "default")
-        # data = self.convert_oneshot(data, "job")
-        # data = self.convert_oneshot(data, "marital")
-        # data = self.convert_oneshot(data, "education")
-        # data = self.convert_oneshot(data, "housing")
-        # data = self.convert_oneshot(data, "loan")
-        # data = self.convert_oneshot(data, "contact")
-        # data = self.convert_oneshot(data, "pdays_dummy")
-
-        data = data.drop(
-            [
-                # "id",
-                "kcal",
-                "temperature",
-                "week",
-                "datetime",
-                "name",
-                # "poutcome",
-                # "age_dummy",
-                # "campaign_dummy",
-                # "duration_dummy",
-                # "previous_dummy",
-                # "duration_contact",
-            ],
-            axis=1,
-        )
-        return data.astype(float)
-
     def adjust_rank(self, data):
         data["first"] = False
         data["second"] = False
@@ -306,7 +246,15 @@ class ProcessedDatasetXGBoost(Dataset):
                 "month",
                 "match",
                 "section",
+                "stage",
+                # "home_rank",
+                "away_rank",
+                "away",
                 "num_tv",
+                "count",
+                # "",
+                # "rank_sum",
+                # "num_tv",
             ],
             axis=1,
         )
@@ -488,8 +436,6 @@ class ProcessedDatasetXGBoost(Dataset):
         self.test_id = full_test["id"]
         self.raw_label = full_train[self.target_feature]
 
-        full_train = full_train.drop([self.target_feature], axis=1)
-
         full_train.loc[full_train["stage"] == "Ｊ１", "stage"] = "J1"
         full_train.loc[full_train["stage"] == "Ｊ２", "stage"] = "J2"
 
@@ -509,6 +455,49 @@ class ProcessedDatasetXGBoost(Dataset):
         full_train = self.calc_rank(full_train)
         full_test = self.calc_rank(full_test)
 
+        full_train2_train = full_train[
+            ((full_train["stage"] == "J1") & (full_train["section"] <= 17))
+            | ((full_train["stage"] == "J2") & (full_train["section"] <= 24))
+        ]
+
+        full_train_2012_train = full_train2_train[full_train2_train["year"] == 2012]
+        full_train_2013_train = full_train2_train[full_train2_train["year"] == 2013]
+        full_train_2014_train = full_train2_train[full_train2_train["year"] == 2014]
+        full_train2_train_2012_grouped = full_train_2012_train.groupby("home")["y"]
+        full_train2_train_2013_grouped = full_train_2013_train.groupby("home")["y"]
+        full_train2_train_2014_grouped = full_train_2014_train.groupby("home")["y"]
+        full_train = full_train.drop([self.target_feature], axis=1)
+
+        describe = ["count", "mean", "std", "min", "t25", "t50", "t75", "max"]
+
+        # full_train2_train[['count' , 'mean', 'std', 'min', 't25', 't50', 't75', 'max']] = full_train2_train['home'].apply(lambda x: grouped.get_group(x).describe())
+
+        # full_train["mean"] = 1.0
+        full_train.loc[full_train["year"] == 2012, describe] = full_train[
+            full_train["year"] == 2012
+        ]["home"].apply(
+            lambda x: full_train2_train_2012_grouped.get_group(x).describe()
+        )
+
+        full_train.loc[full_train["year"] == 2013, describe] = full_train[
+            full_train["year"] == 2013
+        ]["home"].apply(
+            lambda x: full_train2_train_2013_grouped.get_group(x).describe()
+        )
+
+        full_train.loc[full_train["year"] == 2014, describe] = full_train[
+            full_train["year"] == 2014
+        ]["home"].apply(
+            lambda x: full_train2_train_2014_grouped.get_group(x).describe()
+        )
+
+        # self.raw_label = full_train2_train[self.target_feature]
+        # full_train = full_train2_train
+
+        full_test[describe] = full_test["home"].apply(
+            lambda x: full_train2_train_2014_grouped.get_group(x).describe()
+        )
+
         full_train = self.mypreprocessing1(full_train)
         full_test = self.mypreprocessing1(full_test)
 
@@ -522,9 +511,39 @@ class ProcessedDatasetXGBoost(Dataset):
         )
 
         # drop_col = ["capa", "home_rank", "away_rank"]
-        numerical_features = ["capa", "home_rank", "away_rank", "rank_sum"]
+        numerical_features = [
+            # "capa",
+            "home_rank",
+            # "away_rank",
+            "rank_sum",
+            # "home_score",
+            # "away_score",
+            # "mean",
+            # "max",
+            "mean",
+            "min",
+            "max",
+            "std",
+            "t25",
+            "t50",
+            "t75",
+        ]
         # numerical_features = ["home_rank", "away_rank"]
-        categorical_features = list(set(full_train.columns) - set(numerical_features))
+        # categorical_features = list(set(full_train.columns) - set(numerical_features))
+        categorical_features = [
+            # "num_tv",
+            "year",
+            # "stage",
+            "home",
+            # "away",
+            "weekday",
+            "hour",
+            # "weather",
+            # "month",
+            # "stadium",
+            # "home_rank",
+        ]
+        # categorical_features = list(set(full_train.columns) - set(numerical_features))
 
         numerical_transformer.fit(full_train[numerical_features])
         categorical_transformer.fit(full_train[categorical_features])

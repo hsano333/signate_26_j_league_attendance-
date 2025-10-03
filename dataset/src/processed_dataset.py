@@ -656,9 +656,9 @@ class ProcessedDataset(Dataset):
 
         # drop_col = ["capa", "home_rank", "away_rank"]
         numerical_features = [
-            "capa",
-            "home_rank",
-            "away_rank",
+            # "capa",
+            # "home_rank",
+            # "away_rank",
             "rank_sum",
             # "mean",
             # "home_score",
