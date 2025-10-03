@@ -56,7 +56,7 @@ def make_models():
     dataset_category_xgboost.transform_label(task)
     my_torch = MyTorch
     #
-    mytorch = ["mytorch", dataset_torch, my_torch, BaseEvaluation]
+    mytorch = ["mytorch", dataset_category_xgboost, my_torch, BaseEvaluation]
     time_random_forest = [
         "randomforest",
         dataset,
@@ -71,14 +71,14 @@ def make_models():
     ]
     light_gbm = [
         "lightgbm",
-        dataset_category,
+        dataset_category_xgboost,
         MyLightGBM,
         BaseEvaluation,
     ]
     xgboost = ["xgboost", dataset_category_xgboost, MyXGBoost, BaseEvaluation]
     logistic_regression = [
         "logistic_regression",
-        dataset_category,
+        dataset_category_xgboost,
         MyLogisticRegression,
         BaseEvaluation,
     ]

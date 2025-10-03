@@ -44,10 +44,10 @@ model:
       lambda_l1: 0.008008713754555918
       lambda_l2: 1.984668725676424
       learning_rate: 0.45861021208001373
-      max_depth: 10
+      max_depth: 5
       metric: rmse
       min_child_weight: 4
-      n_estimators: 233
+      n_estimators: 1000
       num_leaves: 305
       objective: regression
       verbosity: -1
@@ -549,7 +549,7 @@ model:
       eval_metric: rmse
       gamma: 0.16512650865494377
       learning_rate: 0.02455439144453788
-      max_depth: 3
+      max_depth: 5
       min_child_weight: 2
       n_estimators: 1156
       objective: reg:squarederror

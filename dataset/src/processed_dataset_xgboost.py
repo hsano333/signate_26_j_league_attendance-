@@ -256,6 +256,14 @@ class ProcessedDatasetXGBoost(Dataset):
                 # "home_second_last_bottom",
                 "home_last_top",
                 "home_last_bottom",
+                "count",
+                "mean",
+                "std",
+                "min",
+                "t25",
+                "t50",
+                "t75",
+                "max",
                 # "num_tv",
             ],
             axis=1,
@@ -452,8 +460,6 @@ class ProcessedDatasetXGBoost(Dataset):
         self.test_id = full_test["id"]
         self.raw_label = full_train[self.target_feature]
 
-        full_train = full_train.drop([self.target_feature], axis=1)
-
         full_train.loc[full_train["stage"] == "Ｊ１", "stage"] = "J1"
         full_train.loc[full_train["stage"] == "Ｊ２", "stage"] = "J2"
 
@@ -473,6 +479,60 @@ class ProcessedDatasetXGBoost(Dataset):
         full_train = self.calc_rank(full_train)
         full_test = self.calc_rank(full_test)
 
+        full_train2_train = full_train[
+            ((full_train["stage"] == "J1") & (full_train["section"] <= 17))
+            | ((full_train["stage"] == "J2") & (full_train["section"] <= 24))
+        ]
+
+        full_train_2012_train = full_train2_train[full_train2_train["year"] == 2012]
+        full_train_2013_train = full_train2_train[full_train2_train["year"] == 2013]
+        full_train_2014_train = full_train2_train[full_train2_train["year"] == 2014]
+        full_train2_train_2012_grouped = full_train_2012_train.groupby("home")["y"]
+        full_train2_train_2013_grouped = full_train_2013_train.groupby("home")["y"]
+        full_train2_train_2014_grouped = full_train_2014_train.groupby("home")["y"]
+
+        describe = ["count", "mean", "std", "min", "t25", "t50", "t75", "max"]
+
+        # full_train2_train[['count' , 'mean', 'std', 'min', 't25', 't50', 't75', 'max']] = full_train2_train['home'].apply(lambda x: grouped.get_group(x).describe())
+
+        # full_train["mean"] = 1.0
+        full_train.loc[full_train["year"] == 2012, describe] = full_train[
+            full_train["year"] == 2012
+        ]["home"].apply(
+            lambda x: full_train2_train_2012_grouped.get_group(x).describe()
+        )
+
+        full_train.loc[full_train["year"] == 2013, describe] = full_train[
+            full_train["year"] == 2013
+        ]["home"].apply(
+            lambda x: full_train2_train_2013_grouped.get_group(x).describe()
+        )
+
+        full_train.loc[full_train["year"] == 2014, describe] = full_train[
+            full_train["year"] == 2014
+        ]["home"].apply(
+            lambda x: full_train2_train_2014_grouped.get_group(x).describe()
+        )
+
+        # self.raw_label = full_train2_train[self.target_feature]
+        # full_train = full_train2_train
+
+        full_test[describe] = full_test["home"].apply(
+            lambda x: full_train2_train_2014_grouped.get_group(x).describe()
+        )
+        # full_train["y"] = full_train["y"] - full_train["mean"]
+
+        # print(f"No.1:{full_train.shape=}")
+        # full_train = pd.concat(
+        #     [full_train_2012_train, full_train_2013_train, full_train_2014_train],
+        #     axis=0,
+        # )
+        # print(f"No.2:{full_train.shape=}")
+
+        self.train_mean = full_train["mean"]
+        self.test_mean = full_test["mean"]
+        full_train = full_train.drop([self.target_feature], axis=1)
+
         full_train = self.mypreprocessing1(full_train)
         full_test = self.mypreprocessing1(full_test)
 
@@ -487,7 +547,20 @@ class ProcessedDatasetXGBoost(Dataset):
 
         # drop_col = ["capa", "home_rank", "away_rank"]
         # numerical_features = ["capa", "home_rank", "away_rank", "rank_sum"]
-        numerical_features = ["capa", "home_rank", "away_rank", "num_tv"]
+        numerical_features = [
+            "capa",
+            "home_rank",
+            "away_rank",
+            "num_tv",
+            # "count",
+            # "mean",
+            # "std",
+            # "min",
+            # "t25",
+            # "t50",
+            # "t75",
+            # "max",
+        ]
         # numerical_features = ["capa"]
         # numerical_features = ["home_rank", "away_rank"]
         # numerical_features = ["home_rank", "away_rank"]
