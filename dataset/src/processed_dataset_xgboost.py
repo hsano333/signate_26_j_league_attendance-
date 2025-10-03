@@ -61,11 +61,11 @@ class ProcessedDatasetXGBoost(Dataset):
         # pandas
         return self.raw_label
 
-    def get_label_scaler(self):
-        return self.label_scaler
-
     def convert_np_to_torch(self, data):
         return torch.tensor(data.values.astype(np.float32))
+
+    def get_label_scaler(self):
+        return self.label_scaler
 
     def convert_onehot_encoder(self, encoder, data, name):
         encoderd_data = encoder.transform(data[[name]])
@@ -243,18 +243,12 @@ class ProcessedDatasetXGBoost(Dataset):
                 "humidity",
                 "home_score",
                 "away_score",
+                # "away_rank",
+                "rank_sum",
                 "month",
                 "match",
                 "section",
-                "stage",
-                # "home_rank",
-                "away_rank",
-                "away",
                 "num_tv",
-                "count",
-                # "",
-                # "rank_sum",
-                # "num_tv",
             ],
             axis=1,
         )
@@ -389,7 +383,21 @@ class ProcessedDatasetXGBoost(Dataset):
             how="left",
         )
         df["home_rank"] = df_home["win_rate"]
+        df.loc[df["stage"] == "J1", "home_rank"] = (
+            19 - df[df["stage"] == "J1"]["home_rank"]
+        ) / 34
+        df.loc[df["stage"] == "J2", "home_rank"] = (
+            23 - df[df["stage"] == "J2"]["home_rank"]
+        ) / 42
+
         df["away_rank"] = df_away["win_rate"]
+        df.loc[df["stage"] == "J1", "away_rank"] = (
+            19 - df[df["stage"] == "J1"]["away_rank"]
+        ) / 34
+        df.loc[df["stage"] == "J2", "away_rank"] = (
+            23 - df[df["stage"] == "J2"]["away_rank"]
+        ) / 42
+
         df["rank_sum"] = df["home_rank"] + df["away_rank"]
 
         #    df.loc[df['stage'] == 'J1', "home_rank_section"] = df['home_rank'] / df['section'] * 34
@@ -436,6 +444,8 @@ class ProcessedDatasetXGBoost(Dataset):
         self.test_id = full_test["id"]
         self.raw_label = full_train[self.target_feature]
 
+        full_train = full_train.drop([self.target_feature], axis=1)
+
         full_train.loc[full_train["stage"] == "Ｊ１", "stage"] = "J1"
         full_train.loc[full_train["stage"] == "Ｊ２", "stage"] = "J2"
 
@@ -455,49 +465,6 @@ class ProcessedDatasetXGBoost(Dataset):
         full_train = self.calc_rank(full_train)
         full_test = self.calc_rank(full_test)
 
-        full_train2_train = full_train[
-            ((full_train["stage"] == "J1") & (full_train["section"] <= 17))
-            | ((full_train["stage"] == "J2") & (full_train["section"] <= 24))
-        ]
-
-        full_train_2012_train = full_train2_train[full_train2_train["year"] == 2012]
-        full_train_2013_train = full_train2_train[full_train2_train["year"] == 2013]
-        full_train_2014_train = full_train2_train[full_train2_train["year"] == 2014]
-        full_train2_train_2012_grouped = full_train_2012_train.groupby("home")["y"]
-        full_train2_train_2013_grouped = full_train_2013_train.groupby("home")["y"]
-        full_train2_train_2014_grouped = full_train_2014_train.groupby("home")["y"]
-        full_train = full_train.drop([self.target_feature], axis=1)
-
-        describe = ["count", "mean", "std", "min", "t25", "t50", "t75", "max"]
-
-        # full_train2_train[['count' , 'mean', 'std', 'min', 't25', 't50', 't75', 'max']] = full_train2_train['home'].apply(lambda x: grouped.get_group(x).describe())
-
-        # full_train["mean"] = 1.0
-        full_train.loc[full_train["year"] == 2012, describe] = full_train[
-            full_train["year"] == 2012
-        ]["home"].apply(
-            lambda x: full_train2_train_2012_grouped.get_group(x).describe()
-        )
-
-        full_train.loc[full_train["year"] == 2013, describe] = full_train[
-            full_train["year"] == 2013
-        ]["home"].apply(
-            lambda x: full_train2_train_2013_grouped.get_group(x).describe()
-        )
-
-        full_train.loc[full_train["year"] == 2014, describe] = full_train[
-            full_train["year"] == 2014
-        ]["home"].apply(
-            lambda x: full_train2_train_2014_grouped.get_group(x).describe()
-        )
-
-        # self.raw_label = full_train2_train[self.target_feature]
-        # full_train = full_train2_train
-
-        full_test[describe] = full_test["home"].apply(
-            lambda x: full_train2_train_2014_grouped.get_group(x).describe()
-        )
-
         full_train = self.mypreprocessing1(full_train)
         full_test = self.mypreprocessing1(full_test)
 
@@ -511,39 +478,12 @@ class ProcessedDatasetXGBoost(Dataset):
         )
 
         # drop_col = ["capa", "home_rank", "away_rank"]
-        numerical_features = [
-            # "capa",
-            "home_rank",
-            # "away_rank",
-            "rank_sum",
-            # "home_score",
-            # "away_score",
-            # "mean",
-            # "max",
-            "mean",
-            "min",
-            "max",
-            "std",
-            "t25",
-            "t50",
-            "t75",
-        ]
+        # numerical_features = ["capa", "home_rank", "away_rank", "rank_sum"]
+        numerical_features = ["capa", "home_rank"]
+        # numerical_features = ["capa"]
         # numerical_features = ["home_rank", "away_rank"]
-        # categorical_features = list(set(full_train.columns) - set(numerical_features))
-        categorical_features = [
-            # "num_tv",
-            "year",
-            # "stage",
-            "home",
-            # "away",
-            "weekday",
-            "hour",
-            # "weather",
-            # "month",
-            # "stadium",
-            # "home_rank",
-        ]
-        # categorical_features = list(set(full_train.columns) - set(numerical_features))
+        # numerical_features = ["home_rank", "away_rank"]
+        categorical_features = list(set(full_train.columns) - set(numerical_features))
 
         numerical_transformer.fit(full_train[numerical_features])
         categorical_transformer.fit(full_train[categorical_features])
@@ -554,17 +494,20 @@ class ProcessedDatasetXGBoost(Dataset):
                 ("num", numerical_transformer, numerical_features),
                 ("cat", categorical_transformer, categorical_features),
             ],
-            # 指定していない列をどう扱うか。ここでは除外（デフォルト）。
             # もし残したい列があれば remainder='passthrough' を指定。
             remainder="passthrough",
         )
         col_transformers.fit(full_train)
 
         col_transformers.set_output(transform="pandas")
+        # print(f"{col_transformers=}")
         train_df = col_transformers.transform(full_train)
         test_df = col_transformers.transform(full_test)
+        # print(f"{train_df.columns=}")
+        # print(f"{train_df["num__capa"]=}")
 
         self.data = self.convert_np_to_torch(train_df)
+
         self.label_scaler = StandardScaler()
         # self.label_scaler.fit(stadium[["capa"]])
         self.label = self.label_scaler.fit_transform(
@@ -572,6 +515,7 @@ class ProcessedDatasetXGBoost(Dataset):
         )
         self.label = torch.tensor(self.label, dtype=torch.float32).flatten()
         self.label = self.label.unsqueeze(1)  # Add a dimension for label
+        # print(f"{self.label=}")
 
         self.label_number = 1
         self.test_data = self.convert_np_to_torch(test_df)
