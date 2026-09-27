@@ -43,11 +43,14 @@ class OptunaOptimizer:
 
         if label.ndim == 1:
             split_label = label
+            y_prob_all = np.zeros(len(data))
+            y_true_all = np.zeros(len(data))
         else:
             split_label = label[:, 0]
+            label_unique_num = np.unique(label).shape[0]
+            y_prob_all = np.zeros((len(data), label_unique_num), np.float32)
+            y_true_all = np.zeros(len(data), np.float32)
 
-        y_prob_all = np.zeros(len(data))
-        y_true_all = np.zeros(len(data))
         for i, (tr_idx, val_idx) in enumerate(kf.split(data, split_label)):
             k_directory = self.directory / f"fold_{i + 1}"
             train_data, val_data = data[tr_idx], data[val_idx]
@@ -85,9 +88,15 @@ class OptunaOptimizer:
             new_model.learn(i, params)
             new_model.reload()
             pred = new_model.forecast(torch.tensor(val_data.astype(np.float32)))
-            y_prob_all[val_idx] = pred.numpy().reshape(-1)  # Ensure y_prob_all is 1D
+            if pred.ndim == 1:
+                y_prob_all[val_idx] = pred.numpy().reshape(
+                    -1
+                )  # Ensure y_prob_all is 1D
+                y_true_all[val_idx] = val_label.reshape(-1)  # Ensure y_true_all is 1D
+            elif pred.ndim == 2:
+                y_prob_all[val_idx] = pred.numpy()
+                y_true_all[val_idx] = val_label
             # y_true_all[val_idx] = val_label[:, 0]
-            y_true_all[val_idx] = val_label.reshape(-1)  # Ensure y_true_all is 1D
 
             eval = self.calc_eval(i, y_prob_all, y_true_all)
             trial.report(eval, step=i)

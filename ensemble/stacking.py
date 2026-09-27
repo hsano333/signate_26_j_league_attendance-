@@ -281,4 +281,5 @@ class Stacking(IModel):
         preds_test.append(pred_test.numpy())
         # print(f"{preds_test[-1].shape=}, {len(preds_test)=}, {preds_test[0:10]=}")
         #######################################################
+        new_model.clear()
         return (pred, pred_test)
